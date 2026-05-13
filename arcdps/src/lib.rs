@@ -366,6 +366,10 @@ pub mod __macro {
         }
 
         // initialize imgui & dxgi
+        let (imgui_version, d3d_version) = match d3d_version {
+            d3d @ 0..=999 => (18000, d3d),
+            imver => (imver, 11),
+        };
         unsafe { init_imgui(imgui_ctx, malloc, free) };
         unsafe { init_dxgi(id3d, d3d_version) };
     }

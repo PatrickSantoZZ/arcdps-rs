@@ -12,7 +12,6 @@ license = "MIT"
 
 [dependencies]
 arcdps_codegen = { path = "../arcdps_codegen", optional = true }
-arcdps-imgui = { version = "0.8.0", features = ["tables-api"] }
 bitflags = { workspace = true }
 chrono = { version = "0.4.24", optional = true }
 evtc = { path = "../evtc", features = ["realtime"] }
@@ -28,6 +27,13 @@ windows = { version = "0.62.1", features = [
     "Win32_Graphics_Dxgi",
     "Win32_Graphics_Direct3D11",
 ] }
+
+[dependencies.arcdps-imgui]
+git = "https://codeberg.org/TaimiHUD/imgui-rs"
+branch = "libimgui-19270"
+package = "imgui"
+version = "0.12"
+#features = ["tables-api"]
 
 [features]
 default = ["codegen", "panic", "panic_trace", "panic_msgbox", "unwind"]

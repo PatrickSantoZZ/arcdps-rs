@@ -54,7 +54,7 @@ fn update_url() -> Option<String> {
 
 // Standalone UI creation.
 fn imgui(ui: &imgui::Ui, not_character_select_or_loading: bool) {
-    imgui::Window::new("My Window").build(ui, || {
+    ui.window("My Window").build(|| {
         ui.text("Hello World");
     });
 }
@@ -98,8 +98,8 @@ fn combat(
     id: u64,
     revision: u64,
 ) {
-    if let (Some(event), Some(src)) = (event, src)
-        && event.get_statechange() == StateChange::EnterCombat
+    let state_change = event.map(|e| e.get_statechange());
+    if let (Some(StateChange::EnterCombat), Some(src), ) = (state_change, src)
     {
         log::info!(
             "{} ({}) has entered combat",
