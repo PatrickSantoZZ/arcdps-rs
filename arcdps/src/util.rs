@@ -1,11 +1,17 @@
 //! Miscellaneous utilities.
 
 use std::{
-    ffi::{CStr, OsStr},
-    iter,
-    os::{raw::c_char, windows::prelude::OsStrExt},
+    ffi::CStr,
+    os::raw::c_char,
     slice, str,
 };
+#[cfg(windows)]
+use std::{
+    ffi::OsStr,
+    iter,
+    os::windows::prelude::OsStrExt,
+};
+#[cfg(feature = "windows")]
 use windows::{
     Win32::{
         Foundation::{FARPROC, HMODULE},
@@ -17,8 +23,10 @@ use windows::{
 /// Helper to store raw types as globals.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(transparent)]
+#[allow(dead_code)]
 pub struct Share<T>(T);
 
+#[allow(dead_code)]
 impl<T> Share<T> {
     /// Creates a new share value.
     pub unsafe fn new(value: T) -> Self {
@@ -39,6 +47,7 @@ unsafe impl<T> Send for Share<T> {}
 
 /// Helper to convert a string pointer to a [`prim@str`].
 #[inline]
+#[allow(dead_code)]
 pub unsafe fn str_from_cstr<'a>(ptr: *const c_char) -> Option<&'a str> {
     if ptr.is_null() {
         None
@@ -66,12 +75,15 @@ pub fn strip_account_prefix(account_name: &str) -> &str {
 /// Helper to retrieve an exported function.
 /// Name needs to be null-terminated.
 #[inline]
+#[cfg(feature = "windows")]
 pub unsafe fn exported_proc(handle: HMODULE, name: &'static str) -> FARPROC {
     unsafe { GetProcAddress(handle, PCSTR(name.as_ptr())) }
 }
 
 /// Helper to convert a string to a Windows wide char string.
 #[inline]
+#[allow(dead_code)]
+#[cfg(windows)]
 pub fn str_to_wide(string: impl AsRef<str>) -> Vec<u16> {
     OsStr::new(string.as_ref())
         .encode_wide()

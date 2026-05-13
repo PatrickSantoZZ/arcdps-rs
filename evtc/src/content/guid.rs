@@ -1,5 +1,7 @@
-use std::mem;
+#[cfg(feature = "windows")]
 pub use windows_core::GUID;
+#[cfg(not(feature = "windows"))]
+pub(crate) type GUID = [u32; 4];
 
 /// Extensions for [`GUID`].
 pub trait GuidExt {
@@ -23,6 +25,7 @@ pub trait GuidExt {
     unsafe fn misinterpret(&self) -> [u8; 16];
 }
 
+#[cfg(feature = "windows")]
 impl GuidExt for GUID {
     #[inline]
     fn format_simple(&self) -> String {
@@ -36,7 +39,7 @@ impl GuidExt for GUID {
 
     #[inline]
     unsafe fn misinterpret(&self) -> [u8; 16] {
-        unsafe { mem::transmute::<GUID, [u8; 16]>(*self) }
+        unsafe { core::mem::transmute::<GUID, [u8; 16]>(*self) }
     }
 }
 

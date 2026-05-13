@@ -80,10 +80,25 @@
 
 pub mod callbacks;
 pub mod evtc;
+#[cfg(feature = "windows")]
 pub mod exports;
 
 #[cfg(feature = "extras")]
 pub mod extras;
+
+#[cfg(not(feature = "imgui"))]
+#[doc(hidden)]
+pub mod imgui {
+    use core::convert::Infallible;
+    pub type Ui = Infallible;
+    //pub type Context = Infallible;
+
+    pub mod sys {
+        use core::ffi::c_void;
+        pub type ImGuiContext = c_void;
+        pub type ImVec4 = [f32; 4];
+    }
+}
 
 #[cfg(feature = "log")]
 pub mod log;
@@ -97,13 +112,18 @@ mod util;
 #[cfg(feature = "codegen")]
 pub use arcdps_codegen::export;
 
-pub use crate::globals::{
-    arc::init_arc,
-    dxgi::{d3d_version, d3d11_device, dxgi_swap_chain, init_dxgi},
-    imgui::{imgui_context, init_imgui, with_ui},
+#[cfg(feature = "codegen-globals")]
+pub use crate::globals::arc::init_arc;
+#[cfg(all(feature = "windows", feature = "codegen-globals"))]
+pub use crate::globals::dxgi::{
+    d3d_version, d3d11_device, dxgi_swap_chain, init_dxgi,
 };
 pub use crate::util::strip_account_prefix;
-pub use arcdps_imgui as imgui;
+#[cfg(feature = "imgui")]
+pub use {
+    arcdps_imgui as imgui,
+    imgui::{imgui_context, init_imgui, with_ui},
+};
 pub use evtc::{
     Affinity, Agent, AgentOwned, Attribute, BuffCategory, CombatResult, CustomSkill, Event,
     Language, Profession, Specialization, StateChange,
@@ -311,9 +331,10 @@ pub struct SupportedFields {
 
 /// Exports for usage in macros.
 #[doc(hidden)]
+#[cfg(feature = "codegen-globals")]
 pub mod __macro {
     pub use crate::{
-        globals::imgui::{FreeFn, MallocFn, with_ui},
+        globals::imgui::{FreeFn, MallocFn},
         util::{str_from_cstr, str_to_wide, strip_account_prefix},
     };
     pub use std::ffi::{c_char, c_void};
@@ -322,11 +343,17 @@ pub mod __macro {
         UI::WindowsAndMessaging::{WM_KEYDOWN, WM_KEYUP, WM_SYSKEYDOWN, WM_SYSKEYUP},
     };
 
+    #[cfg(feature = "imgui")]
+    pub use crate::globals::imgui::with_ui;
+
     use crate::{
         exports::has_e3_log_file,
-        globals::{dxgi::init_dxgi, imgui::init_imgui},
+        globals::dxgi::init_dxgi,
         imgui, init_arc,
     };
+
+    #[cfg(feature = "imgui")]
+    use crate::globals::imgui::init_imgui;
 
     #[cfg(feature = "panic")]
     use crate::panic::init_panic_hook;
@@ -370,7 +397,9 @@ pub mod __macro {
             d3d @ 0..=999 => (18000, d3d),
             imver => (imver, 11),
         };
+        #[cfg(feature = "imgui")]
         unsafe { init_imgui(imgui_ctx, malloc, free) };
+        #[cfg(feature = "windows")]
         unsafe { init_dxgi(id3d, d3d_version) };
     }
 }

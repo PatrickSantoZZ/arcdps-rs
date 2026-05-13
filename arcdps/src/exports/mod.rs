@@ -2,14 +2,17 @@
 //!
 //! Calling an export before ArcDPS calls `init` will cause a panic.
 
+#[cfg(feature = "codegen-globals")]
 mod has;
 pub mod raw;
 
+#[cfg(feature = "codegen-globals")]
 pub use self::has::*;
 
+#[cfg(feature = "codegen-globals")]
+use crate::globals::arc::ArcGlobals;
 use crate::{
     evtc::{Event, Profession},
-    globals::arc::ArcGlobals,
     imgui::sys::ImVec4,
 };
 use num_enum::{IntoPrimitive, TryFromPrimitive};
@@ -31,6 +34,7 @@ use strum::{Display, EnumCount, EnumIter, IntoStaticStr, VariantNames};
 
 /// Retrieves the ArcDPS version as string.
 #[inline]
+#[cfg(feature = "codegen-globals")]
 pub fn version() -> Option<&'static str> {
     ArcGlobals::get().version
 }
@@ -49,6 +53,7 @@ pub fn version() -> Option<&'static str> {
 /// # None }
 /// ```
 #[inline]
+#[cfg(feature = "codegen-globals")]
 pub fn config_path() -> Option<PathBuf> {
     let ptr = unsafe { raw::e0_config_path() };
     if !ptr.is_null() {
@@ -78,6 +83,7 @@ pub fn config_path() -> Option<PathBuf> {
 /// exports::log_to_file("message from my plugin");
 /// ```
 #[inline]
+#[cfg(feature = "codegen-globals")]
 pub fn log_to_file(message: impl Into<String>) -> Result<(), NulError> {
     let string = CString::new(message.into())?;
     unsafe { raw::e3_log_file(string.as_ptr()) };
@@ -200,6 +206,7 @@ impl Colors {
 /// let guard = colors.prof_base(Profession::Guardian);
 /// ```
 #[inline]
+#[cfg(feature = "codegen-globals")]
 pub fn colors() -> Colors {
     // zeroing this is important for our null pointer checks later
     let mut colors = MaybeUninit::zeroed();
@@ -242,6 +249,7 @@ pub struct UISettings {
 ///     ui.text("hello world");
 /// }
 /// ```
+#[cfg(feature = "codegen-globals")]
 pub fn ui_settings() -> UISettings {
     let raw = unsafe { raw::e6_ui_settings() };
     UISettings {
@@ -276,6 +284,7 @@ pub struct Modifiers {
 /// let multi = modifiers.modifier_multi;
 /// ```
 #[inline]
+#[cfg(feature = "codegen-globals")]
 pub fn modifiers() -> Modifiers {
     let raw = unsafe { raw::e7_modifiers() };
     Modifiers {
@@ -298,6 +307,7 @@ pub fn modifiers() -> Modifiers {
 /// exports::log_to_window("message from my plugin");
 /// ```
 #[inline]
+#[cfg(feature = "codegen-globals")]
 pub fn log_to_window(message: impl Into<String>) -> Result<(), NulError> {
     let string = CString::new(message.into())?;
     unsafe { raw::e8_log_window(string.as_ptr()) };
@@ -309,6 +319,7 @@ pub fn log_to_window(message: impl Into<String>) -> Result<(), NulError> {
 /// `is_statechange` will be set to [`StateChange::Extension`](crate::StateChange::Extension), padding will be set to contain `sig`.
 /// Event will end up processed like ArcDPS events and logged to EVTC.
 #[inline]
+#[cfg(feature = "codegen-globals")]
 pub fn add_event(event: &Event, sig: u32) {
     unsafe { raw::e9_add_event(event, sig) }
 }
@@ -320,6 +331,7 @@ pub fn add_event(event: &Event, sig: u32) {
 ///
 /// Contrary to [`add_event`], the `skill_id` is treated as skill id and will be added to the EVTC skill table.
 #[inline]
+#[cfg(feature = "codegen-globals")]
 pub fn add_event_combat(event: &Event, sig: u32) {
     unsafe { raw::e10_add_event_combat(event, sig) }
 }
@@ -331,6 +343,7 @@ pub fn add_event_combat(event: &Event, sig: u32) {
 ///
 /// This uses version 2 (`addextension2`) of the extension API.
 #[inline]
+#[cfg(feature = "codegen-globals")]
 pub fn add_extension(handle: HMODULE) -> AddExtensionResult {
     unsafe { raw::add_extension(handle) }
         .try_into()
@@ -384,6 +397,7 @@ pub enum AddExtensionResult {
 ///
 /// This uses version 2 (`freeextension2`) of the extension API.
 #[inline]
+#[cfg(feature = "codegen-globals")]
 pub fn free_extension(sig: u32) -> Option<HMODULE> {
     let handle = unsafe { raw::free_extension(sig) };
     (!handle.is_invalid()).then_some(handle)

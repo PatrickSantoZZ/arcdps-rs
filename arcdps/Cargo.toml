@@ -26,7 +26,7 @@ windows = { version = "0.61", features = [
     "Win32_System_LibraryLoader",
     "Win32_Graphics_Dxgi",
     "Win32_Graphics_Direct3D11",
-] }
+], optional = true }
 
 [dependencies.arcdps-imgui]
 git = "https://codeberg.org/TaimiHUD/imgui-rs"
@@ -34,11 +34,14 @@ branch = "libimgui-19270"
 package = "imgui"
 version = "0.12"
 #features = ["tables-api"]
+optional = true
 
 [features]
-default = ["codegen", "panic", "panic_trace", "panic_msgbox", "unwind"]
-codegen = ["dep:arcdps_codegen"]
+default = ["codegen", "imgui", "panic", "panic_trace", "panic_msgbox", "unwind"]
+codegen = ["dep:arcdps_codegen", "codegen-globals"]
+codegen-globals = ["windows"]
 extras = ["arcdps_codegen/extras", "dep:chrono"]
+imgui = ["dep:arcdps-imgui"]
 log = ["dep:log"]
 panic = []
 panic_trace = ["panic"]

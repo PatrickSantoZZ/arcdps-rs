@@ -6,7 +6,14 @@ use crate::{
     util::abi,
 };
 use std::ffi::c_char;
+#[cfg(feature = "windows")]
 use windows::Win32::Foundation::{HWND, LPARAM, WPARAM};
+#[cfg(not(feature = "windows"))]
+type HWND = *mut core::ffi::c_void;
+#[cfg(not(feature = "windows"))]
+type WPARAM = usize;
+#[cfg(not(feature = "windows"))]
+type LPARAM = isize;
 
 /// Exported struct for ArcDPS plugins.
 #[repr(C)]

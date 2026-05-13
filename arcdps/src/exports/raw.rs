@@ -1,10 +1,14 @@
 //! Raw ArcDPS exports.
 
-use crate::{evtc::Event, globals::arc::ArcGlobals, imgui::sys::ImVec4};
+#[cfg(feature = "codegen-globals")]
+use crate::globals::arc::ArcGlobals;
+use crate::{evtc::Event, imgui::sys::ImVec4};
 use std::ffi::{c_char, c_void};
+#[cfg(feature = "windows")]
 use windows::Win32::Foundation::HMODULE;
 
 /// Returns the handle to the ArcDPS dll.
+#[cfg(feature = "codegen-globals")]
 pub unsafe fn handle() -> HMODULE {
     ArcGlobals::get().handle
 }
@@ -14,6 +18,7 @@ pub type Export0 = unsafe extern "C" fn() -> *const u16;
 
 /// Retrieves path to ArcDPS ini config file as wide char string.
 #[inline]
+#[cfg(feature = "codegen-globals")]
 pub unsafe fn e0_config_path() -> *const u16 {
     let e0 = ArcGlobals::get().e0.expect("failed to find arc export e0");
     unsafe { e0() }
@@ -24,6 +29,7 @@ pub type Export3 = unsafe extern "C" fn(string: *const c_char);
 
 /// Logs a string to `arcdps.log` file.
 #[inline]
+#[cfg(feature = "codegen-globals")]
 pub unsafe fn e3_log_file(string: *const c_char) {
     let e3 = ArcGlobals::get().e3.expect("failed to find arc export e3");
     unsafe { e3(string) }
@@ -34,6 +40,7 @@ pub type Export5 = unsafe extern "C" fn(out: *mut [*mut ImVec4; 5]);
 
 /// Writes color array pointers to buffer.
 #[inline]
+#[cfg(feature = "codegen-globals")]
 pub unsafe fn e5_colors(buffer: *mut [*mut ImVec4; 5]) {
     let e5 = ArcGlobals::get().e5.expect("failed to find arc export e5");
     unsafe { e5(buffer) }
@@ -44,6 +51,7 @@ pub type Export6 = unsafe extern "C" fn() -> u64;
 
 /// Retrieves bit mask of current ArcDPS UI settings.
 #[inline]
+#[cfg(feature = "codegen-globals")]
 pub unsafe fn e6_ui_settings() -> u64 {
     let e6 = ArcGlobals::get().e6.expect("failed to find arc export e6");
     unsafe { e6() }
@@ -54,6 +62,7 @@ pub type Export7 = unsafe extern "C" fn() -> u64;
 
 /// Retrieves modifier keys as virtual key codes.
 #[inline]
+#[cfg(feature = "codegen-globals")]
 pub unsafe fn e7_modifiers() -> u64 {
     let e7 = ArcGlobals::get().e7.expect("failed to find arc export e7");
     unsafe { e7() }
@@ -66,6 +75,7 @@ pub type Export8 = unsafe extern "C" fn(string: *const c_char);
 ///
 /// Colors are HTML-like: `<c=#aaaaaa>colored text</c>`.
 #[inline]
+#[cfg(feature = "codegen-globals")]
 pub unsafe fn e8_log_window(string: *const c_char) {
     let e8 = ArcGlobals::get().e8.expect("failed to find arc export e8");
     unsafe { e8(string) }
@@ -79,6 +89,7 @@ pub type Export9 = unsafe extern "C" fn(event: *const Event, sig: u32);
 /// `is_statechange` will be set to [`StateChange::Extension`](crate::evtc::StateChange::Extension), pad61-64 will be set to `sig`.
 /// Event will end up processed like ArcDPS events and logged to EVTC.
 #[inline]
+#[cfg(feature = "codegen-globals")]
 pub unsafe fn e9_add_event(event: *const Event, sig: u32) {
     let e9 = ArcGlobals::get().e9.expect("failed to find arc export e9");
     unsafe { e9(event, sig) }
@@ -94,6 +105,7 @@ pub type Export10 = unsafe extern "C" fn(event: *const Event, sig: u32);
 ///
 /// Contrary to [`e9_add_event`], the `skill_id` is treated as skill id and will be added to the EVTC skill table.
 #[inline]
+#[cfg(feature = "codegen-globals")]
 pub unsafe fn e10_add_event_combat(event: *const Event, sig: u32) {
     let e10 = ArcGlobals::get()
         .e10
@@ -111,6 +123,7 @@ pub type ExportAddExtension = unsafe extern "C" fn(handle: HMODULE) -> u32;
 ///
 /// This uses version 2 (`addextension2`) of the extension API.
 #[inline]
+#[cfg(feature = "codegen-globals")]
 pub unsafe fn add_extension(handle: HMODULE) -> u32 {
     let add_extension = ArcGlobals::get()
         .add_extension
@@ -130,6 +143,7 @@ pub type ExportFreeExtension = unsafe extern "C" fn(sig: u32) -> HMODULE;
 ///
 /// This uses version 2 (`freeextension2`) of the extension API.
 #[inline]
+#[cfg(feature = "codegen-globals")]
 pub unsafe fn free_extension(sig: u32) -> HMODULE {
     let free_extension = ArcGlobals::get()
         .free_extension
@@ -145,6 +159,7 @@ pub type ExportListExtension = unsafe extern "C" fn(callback_fn: *const c_void);
 /// `callback_fn` is a callback of type `void callback_fn(arcdps_exports* exp)`.
 /// Callback is called once for each extension current loaded.
 #[inline]
+#[cfg(feature = "codegen-globals")]
 pub unsafe fn list_extension(callback_fn: *const c_void) {
     // TODO: is this sync?
     // TODO: bindings should check for uninitialized

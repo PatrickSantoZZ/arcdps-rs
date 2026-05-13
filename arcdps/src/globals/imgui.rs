@@ -1,16 +1,23 @@
+#[cfg(all(feature = "imgui", feature = "codegen-globals"))]
 use crate::{
     imgui::{self, Context, Ui},
     util::Share,
 };
-use std::{ffi::c_void, mem::ManuallyDrop, ptr, sync::OnceLock};
+#[cfg(all(feature = "imgui", feature = "codegen-globals"))]
+use std::{mem::ManuallyDrop, ptr, sync::OnceLock};
+use std::ffi::c_void;
 
+#[allow(dead_code)]
 pub type MallocFn = unsafe extern "C" fn(size: usize, user_data: *mut c_void) -> *mut c_void;
 
+#[allow(dead_code)]
 pub type FreeFn = unsafe extern "C" fn(ptr: *mut c_void, user_data: *mut c_void);
 
 /// ImGui context.
+#[cfg(all(feature = "imgui", feature = "codegen-globals"))]
 pub static IG_CONTEXT: OnceLock<Share<ManuallyDrop<Context>>> = OnceLock::new();
 
+#[cfg(all(feature = "imgui", feature = "codegen-globals"))]
 thread_local! {
     /// ImGui UI.
     pub static IG_UI: Ui = unsafe {
@@ -20,6 +27,7 @@ thread_local! {
 }
 
 /// Initializes ImGui information.
+#[cfg(all(feature = "imgui", feature = "codegen-globals"))]
 pub unsafe fn init_imgui(
     ctx: *mut imgui::sys::ImGuiContext,
     malloc: Option<MallocFn>,
@@ -39,6 +47,7 @@ pub unsafe fn init_imgui(
 
 /// Retrieves the [`imgui::Context`].
 #[inline]
+#[cfg(all(feature = "imgui", feature = "codegen-globals"))]
 pub unsafe fn imgui_context() -> &'static Context {
     unsafe {
         IG_CONTEXT
@@ -50,6 +59,7 @@ pub unsafe fn imgui_context() -> &'static Context {
 
 /// Retrieves the [`imgui::Ui`] for rendering.
 #[inline]
+#[cfg(all(feature = "imgui", feature = "codegen-globals"))]
 pub unsafe fn with_ui<R>(body: impl FnOnce(&Ui) -> R) -> R {
     IG_UI.with(body)
 }

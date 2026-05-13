@@ -43,6 +43,7 @@ pub struct ContentInfo {
 impl ContentInfo {
     /// Formats the contained GUID as [`String`].
     #[inline]
+    #[cfg(feature = "windows")]
     pub fn guid_string(&self) -> String {
         self.guid.format_simple()
     }

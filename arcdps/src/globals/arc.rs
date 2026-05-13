@@ -15,6 +15,7 @@ pub unsafe fn init_arc(arc_handle: HMODULE, version: *const c_char) {
 }
 
 /// Global instance of ArcDPS handle & exported functions.
+#[cfg(feature = "codegen-globals")]
 static ARC_GLOBALS: OnceLock<ArcGlobals> = OnceLock::new();
 
 /// ArcDPS handle & exported functions.

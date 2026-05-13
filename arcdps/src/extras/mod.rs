@@ -3,11 +3,13 @@
 //! *Requires the `"extras"` feature.*
 
 pub mod callbacks;
+#[cfg(feature = "codegen-globals")]
 pub mod exports;
 pub mod keybinds;
 pub mod message;
 pub mod user;
 
+#[cfg(feature = "codegen-globals")]
 mod globals;
 mod version;
 
@@ -22,9 +24,13 @@ pub use message::{
 };
 pub use user::{UserInfo, UserInfoIter, UserInfoOwned, UserRole};
 
+#[cfg(feature = "codegen-globals")]
 use globals::ExtrasGlobals;
 use std::ffi::c_char;
+#[cfg(feature = "windows")]
 use windows::Win32::Foundation::HMODULE;
+#[cfg(not(feature = "windows"))]
+type HMODULE = *mut core::ffi::c_void;
 
 pub use version::ExtrasVersion;
 
@@ -187,6 +193,7 @@ impl ExtrasSubscriberInfo {
         if let Some(sub_info_version) = version.get_version_to_use() {
             unsafe {
                 // initialize globals
+                #[cfg(feature = "codegen-globals")]
                 ExtrasGlobals::init(
                     extras_addon.extras_handle,
                     str_from_cstr(extras_addon.string_version),
